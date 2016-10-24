@@ -87,5 +87,8 @@ RUN for PYBIN in /opt/python/*/bin; do \
         $PYBIN/pip install -r /tmp/requirements.txt ; \
     done
 
+# Replace SWIG's setup.py with this modified one, which gets numpy in there as a dependency.
+ADD setup.py /src/gdal-2.1.1/swig/python/setup.py
+
 WORKDIR /io
 CMD ["/io/build-linux-wheels.sh"]
