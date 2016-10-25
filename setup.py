@@ -10,6 +10,7 @@
 gdal_version = '2.1.1'
 
 import sys
+import shutil
 import os
 
 from glob import glob
@@ -43,6 +44,13 @@ def get_numpy_include():
     else:
         return '.'
 
+def copy_data_tree(datadir, destdir):
+    try:
+        shutil.rmtree(destdir)
+    except OSError:
+        pass
+    shutil.copytree(datadir, destdir)
+            
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
@@ -298,6 +306,10 @@ else:
 
 exclude_package_data = {'':['GNUmakefile']}
 
+# Copy gdal/proj data.
+copy_data_tree('/usr/local/share/gdal', 'osgeo/gdal_data')
+copy_data_tree('/usr/local/share/proj', 'osgeo/proj_data')
+
 if HAVE_SETUPTOOLS:
     setup( name = name,
            version = gdal_version,
@@ -318,6 +330,7 @@ if HAVE_SETUPTOOLS:
            cmdclass={'build_ext':gdal_ext},
            ext_modules = ext_modules,
            install_requires=['numpy=={}'.format(numpy.__version__)],
+           package_data={'osgeo': ['gdal_data/*', 'proj_data/*']},
            **extra )
 else:
     setup( name = name,

@@ -87,8 +87,14 @@ RUN for PYBIN in /opt/python/*/bin; do \
         $PYBIN/pip install -r /tmp/requirements.txt ; \
     done
 
-# Replace SWIG's setup.py with this modified one, which gets numpy in there as a dependency.
+# Replace SWIG's setup.py with this modified one, which gets numpy in
+# there as a dependency.
 ADD setup.py /src/gdal-2.1.1/swig/python/setup.py
+
+# Replace the osgeo module __init__.py with this modified one, which
+# sets the GDAL_DATA and PROJ_LIB variables on import to where they've
+# been copied to.
+ADD gdalinit.py /src/gdal-2.1.1/swig/python/osgeo/__init__.py
 
 WORKDIR /io
 CMD ["/io/build-linux-wheels.sh"]
