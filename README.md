@@ -14,7 +14,7 @@ To build, clone this repo, navigate to its root and run `make wheels`.  The cont
 
 The resulting wheels have the gdal and proj data directories packaged up inside of them, but you can set the appropriate environment viaraibles to use your own data directories. 
 
-## Using the Wheels.
+## Using the Wheels
 
 These may be `pip` installed into your linux environment ad nauseam.  For example, from the directory containing the 'wheels' directory, you can run
 ```
@@ -22,6 +22,6 @@ docker run -v `pwd`:/io -it --rm python:2.7 /bin/bash
 ```
 to get yourself into a clean python docker container.  From inside this container, try
 ```
-pip install /io/wheels/GDAL-2.1.3-cp27-cp27mu-manylinux1_x86_64.whl
+pip install /io/wheels/GDAL-2.2.4-cp27-cp27mu-manylinux1_x86_64.whl
 ```
 You should experience a quick install of GDAL and Numpy.  Try them out!

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-GDAL_BUILD_PATH=/src/gdal-2.1.3/swig/python
+GDAL_BUILD_PATH=/src/gdal-2.2.4/swig/python
 ORIGINAL_PATH=$PATH
 UNREPAIRED_WHEELS=/tmp/wheels
 
