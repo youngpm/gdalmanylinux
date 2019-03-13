@@ -41,9 +41,9 @@ RUN mkdir -p /src \
 # Install geos
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/geos/geos-3.6.2.tar.bz2 \
-    && tar jxf geos-3.6.2.tar.bz2 \
-    && cd /src/geos-3.6.2 \
+    && curl -f -L -O http://download.osgeo.org/geos/geos-3.6.3.tar.bz2 \
+    && tar jxf geos-3.6.3.tar.bz2 \
+    && cd /src/geos-3.6.3 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
     && make -j 4 \
     && make install \
@@ -131,9 +131,9 @@ RUN cd /usr/local/src \
 # gdal
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/gdal/2.3.0/gdal-2.3.0.tar.gz \
-    && tar xzf gdal-2.3.0.tar.gz \
-    && cd /src/gdal-2.3.0 \
+    && curl -f -L -O http://download.osgeo.org/gdal/2.4.0/gdal-2.4.0.tar.gz \
+    && tar xzf gdal-2.4.0.tar.gz \
+    && cd /src/gdal-2.4.0 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
         --with-threads \
         --disable-debug \
@@ -180,12 +180,12 @@ RUN for PYBIN in /opt/python/*/bin; do \
 
 # Replace SWIG's setup.py with this modified one, which gets numpy in
 # there as a dependency.
-ADD setup.py /src/gdal-2.3.0/swig/python/setup.py
+ADD setup.py /src/gdal-2.4.0/swig/python/setup.py
 
 # Replace the osgeo module __init__.py with this modified one, which
 # sets the GDAL_DATA and PROJ_LIB variables on import to where they've
 # been copied to.
-ADD gdalinit.py /src/gdal-2.3.0/swig/python/osgeo/__init__.py
+ADD gdalinit.py /src/gdal-2.4.0/swig/python/osgeo/__init__.py
 
 WORKDIR /io
 CMD ["/io/build-linux-wheels.sh"]
