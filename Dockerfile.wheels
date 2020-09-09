@@ -174,8 +174,8 @@ ADD requirements.txt /tmp/requirements.txt
 RUN for PYBIN in /opt/python/*/bin; do \
         if [[ $PYBIN == *"26"* ]]; then continue; fi; \
         if [[ $PYBIN == *"33"* ]]; then continue; fi; \
-        $PYBIN/pip install -U pip ; \
-        $PYBIN/pip install -r /tmp/requirements.txt ; \
+        $PYBIN/pip install -U pip || true; \
+        $PYBIN/pip install -r /tmp/requirements.txt || true; \
     done
 
 # Replace SWIG's setup.py with this modified one, which gets numpy in
