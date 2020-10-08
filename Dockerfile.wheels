@@ -174,6 +174,7 @@ ADD requirements.txt /tmp/requirements.txt
 RUN for PYBIN in /opt/python/*/bin; do \
         if [[ $PYBIN == *"26"* ]]; then continue; fi; \
         if [[ $PYBIN == *"33"* ]]; then continue; fi; \
+        if [[ $PYBIN == *"39"* ]]; then continue; fi; \
         $PYBIN/pip install -U pip ; \
         $PYBIN/pip install -r /tmp/requirements.txt ; \
     done

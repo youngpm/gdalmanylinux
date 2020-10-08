@@ -13,6 +13,7 @@ pushd ${GDAL_BUILD_PATH}
 for PYBIN in /opt/python/*/bin; do
     if [[ $PYBIN == *"26"* ]]; then continue; fi
     if [[ $PYBIN == *"33"* ]]; then continue; fi
+    if [[ $PYBIN == *"39"* ]]; then continue; fi
     export PATH=${PYBIN}:$ORIGINAL_PATH
     rm -rf build
     CFLAGS="-std=c++11" python setup.py bdist_wheel -d ${UNREPAIRED_WHEELS}
