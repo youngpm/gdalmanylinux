@@ -7,7 +7,7 @@
 # Howard Butler hobu.inc@gmail.com
 
 
-gdal_version = '2.4.0'
+gdal_version = '3.1.4'
 
 import sys
 import shutil
@@ -50,7 +50,7 @@ def copy_data_tree(datadir, destdir):
     except OSError:
         pass
     shutil.copytree(datadir, destdir)
-            
+
 # ---------------------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------------------
@@ -271,7 +271,7 @@ if HAVE_NUMPY:
 
 packages = ["osgeo",]
 
-readme = str(open('README.txt','rb').read())
+readme = ""#str(open('README.txt','rb').read())
 
 name = 'GDAL'
 version = gdal_version

@@ -41,9 +41,9 @@ RUN mkdir -p /src \
 # Install geos
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/geos/geos-3.6.3.tar.bz2 \
-    && tar jxf geos-3.6.3.tar.bz2 \
-    && cd /src/geos-3.6.3 \
+    && curl -f -L -O http://download.osgeo.org/geos/geos-3.8.1.tar.bz2 \
+    && tar jxf geos-3.8.1.tar.bz2 \
+    && cd /src/geos-3.8.1 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
     && make -j 4 \
     && make install \
@@ -60,12 +60,12 @@ RUN mkdir -p /src \
     && make install \
     && rm -rf /src
 
-# proj4
+# proj6
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/proj/proj-4.9.3.tar.gz \
-    && tar xzf proj-4.9.3.tar.gz \
-    && cd /src/proj-4.9.3 \
+    && curl -f -L -O http://download.osgeo.org/proj/proj-6.3.1.tar.gz \
+    && tar xzf proj-6.3.1.tar.gz \
+    && cd /src/proj-6.3.1 \
     && ./configure CFLAGS="-O2 -Wl,-S" \
     && make -j 4 \
     && make install \
@@ -131,9 +131,9 @@ RUN cd /usr/local/src \
 # gdal
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/gdal/2.4.0/gdal-2.4.0.tar.gz \
-    && tar xzf gdal-2.4.0.tar.gz \
-    && cd /src/gdal-2.4.0 \
+    && curl -f -L -O https://github.com/OSGeo/gdal/releases/download/v3.1.4/gdal-3.1.4.tar.gz \
+    && tar xzf gdal-3.1.4.tar.gz \
+    && cd /src/gdal-3.1.4 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
         --with-threads \
         --disable-debug \
@@ -154,7 +154,7 @@ RUN mkdir -p /src \
         --with-grib \
         --with-pam \
         --with-geos=/usr/local/bin/geos-config \
-        --with-static-proj4=/usr/local \
+        --with-proj=/usr/local \
         --with-expat=/usr/local \
         --with-libjson-c \
         --with-libiconv-prefix=/usr \
@@ -181,12 +181,12 @@ RUN for PYBIN in /opt/python/*/bin; do \
 
 # Replace SWIG's setup.py with this modified one, which gets numpy in
 # there as a dependency.
-ADD setup.py /src/gdal-2.4.0/swig/python/setup.py
+ADD setup.py /src/gdal-3.1.4/swig/python/setup.py
 
 # Replace the osgeo module __init__.py with this modified one, which
 # sets the GDAL_DATA and PROJ_LIB variables on import to where they've
 # been copied to.
-ADD gdalinit.py /src/gdal-2.4.0/swig/python/osgeo/__init__.py
+ADD gdalinit.py /src/gdal-3.1.4/swig/python/osgeo/__init__.py
 
 WORKDIR /io
 CMD ["/io/build-linux-wheels.sh"]
