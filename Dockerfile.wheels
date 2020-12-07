@@ -6,13 +6,17 @@
 # Note well: a very limited set of format drivers are included in these
 # wheels. See the GDAL configuration below for details.
 
-FROM quay.io/pypa/manylinux1_x86_64
+FROM quay.io/pypa/manylinux2010_x86_64
 
 RUN sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf \
     && sed -i 's/mirrorlist/#mirrorlist/' /etc/yum.repos.d/CentOS-Base.repo \
     && sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever|baseurl=http://vault.centos.org/5.11|' /etc/yum.repos.d/CentOS-Base.repo
 
 RUN yum update -y && yum install -y curl-devel json-c-devel zlib-devel libtiff-devel
+RUN yum install -y https://download.postgresql.org/pub/repos/yum/12/redhat/rhel-6-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+    yum update -y && \
+    yum install -y postgresql12-devel
+
 
 # Install openssl
 RUN mkdir -p /src \
@@ -94,9 +98,9 @@ RUN mkdir -p /src \
 
 # hdf
 RUN cd /usr/local/src \
-    && curl -f -L -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz \
-    && tar xzf hdf5-1.10.2.tar.gz \
-    && cd hdf5-1.10.2 \
+    && curl -f -L -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.gz \
+    && tar xzf hdf5-1.12.0.tar.gz \
+    && cd hdf5-1.12.0 \
     && ./configure --prefix=/usr/local --enable-shared --enable-build-mode=production CFLAGS="-O2 -Wl,-S" \
     && make -j 4 \
     && make install
@@ -134,7 +138,7 @@ RUN mkdir -p /src \
     && curl -f -L -O https://github.com/OSGeo/gdal/releases/download/v3.1.4/gdal-3.1.4.tar.gz \
     && tar xzf gdal-3.1.4.tar.gz \
     && cd /src/gdal-3.1.4 \
-    && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
+    && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" PKG_CONFIG_PATH=/usr/pgsql-12/lib/pkgconfig/ ./configure \
         --with-threads \
         --disable-debug \
         --disable-static \
@@ -163,9 +167,10 @@ RUN mkdir -p /src \
         --with-netcdf=/usr/local/netcdf \
         --with-openjpeg \
         --with-jasper=/usr/local \
+        --with-pg \
+        --with-hdf5 \
         --without-python \
         --without-hdf4 \
-        --without-hdf5 \
     && make -j 4 \
     && make install
 
