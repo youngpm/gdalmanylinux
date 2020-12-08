@@ -5,6 +5,9 @@ GDAL_BUILD_PATH=/src/gdal-3.1.4/swig/python
 ORIGINAL_PATH=$PATH
 UNREPAIRED_WHEELS=/tmp/wheels
 
+# Enable devtoolset-2 for C++11
+source /opt/rh/devtoolset-2/enable
+
 # Compile wheels
 pushd ${GDAL_BUILD_PATH}
 for PYBIN in /opt/python/*/bin; do
