@@ -128,7 +128,7 @@ RUN cd /usr/local/src \
     && make -j 4 \
     && make install
 
-RUN yum install postgresql-devel
+RUN yum -y install postgresql-devel
     
 # gdal
 RUN mkdir -p /src \
