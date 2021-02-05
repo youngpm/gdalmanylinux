@@ -7,7 +7,7 @@
 # Howard Butler hobu.inc@gmail.com
 
 
-gdal_version = '2.4.0'
+gdal_version = '2.4.4'
 
 import sys
 import shutil
@@ -271,7 +271,7 @@ if HAVE_NUMPY:
 
 packages = ["osgeo",]
 
-readme = str(open('README.txt','rb').read())
+readme = str(open('README.rst','rb').read())
 
 name = 'GDAL'
 version = gdal_version

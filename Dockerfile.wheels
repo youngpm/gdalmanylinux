@@ -12,7 +12,7 @@ RUN sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf \
     && sed -i 's/mirrorlist/#mirrorlist/' /etc/yum.repos.d/CentOS-Base.repo \
     && sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever|baseurl=http://vault.centos.org/5.11|' /etc/yum.repos.d/CentOS-Base.repo
 
-RUN yum update -y && yum install -y curl-devel json-c-devel zlib-devel libtiff-devel
+RUN yum update -y && yum install -y curl-devel json-c-devel zlib-devel libtiff-devel postgresql-devel
 
 # Install openssl
 RUN mkdir -p /src \
@@ -30,9 +30,9 @@ RUN mkdir -p /src \
 # Install curl
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://curl.askapache.com/download/curl-7.59.0.tar.bz2 \
-    && tar jxf curl-7.59.0.tar.bz2 \
-    && cd /src/curl-7.59.0 \
+    && curl -f -L -O http://curl.askapache.com/download/curl-7.73.0.tar.bz2 \
+    && tar jxf curl-7.73.0.tar.bz2 \
+    && cd /src/curl-7.73.0 \
     && LIBS=-ldl CFLAGS="-O2 -Wl,-S" ./configure --with-ssl=/usr/local/ssl \
     && make -j 4 \
     && make install \
@@ -41,9 +41,9 @@ RUN mkdir -p /src \
 # Install geos
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/geos/geos-3.6.3.tar.bz2 \
-    && tar jxf geos-3.6.3.tar.bz2 \
-    && cd /src/geos-3.6.3 \
+    && curl -f -L -O http://download.osgeo.org/geos/geos-3.9.0.tar.bz2 \
+    && tar jxf geos-3.9.0.tar.bz2 \
+    && cd /src/geos-3.9.0 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
     && make -j 4 \
     && make install \
@@ -73,18 +73,18 @@ RUN mkdir -p /src \
 
 # cmake
 RUN cd /usr/local/src \
-    && curl -f -L -O http://www.cmake.org/files/v3.11/cmake-3.11.1.tar.gz \
-    && tar xzf cmake-3.11.1.tar.gz \
-    && cd cmake-3.11.1 \
+    && curl -f -L -O http://www.cmake.org/files/v3.13/cmake-3.13.5.tar.gz \
+    && tar xzf cmake-3.13.5.tar.gz \
+    && cd cmake-3.13.5 \
     && ./bootstrap --prefix=/usr/local/cmake \
     && make -j 4; make install
 
 # openjpeg
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O https://github.com/uclouvain/openjpeg/archive/v2.3.0.tar.gz \
-    && tar xzf v2.3.0.tar.gz \
-    && cd /src/openjpeg-2.3.0 \
+    && curl -f -L -O https://github.com/uclouvain/openjpeg/archive/v2.4.0.tar.gz \
+    && tar xzf v2.4.0.tar.gz \
+    && cd /src/openjpeg-2.4.0 \
     && mkdir -p build \
     && cd build \
     && /usr/local/cmake/bin/cmake .. -DBUILD_THIRDPARTY:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
@@ -92,11 +92,11 @@ RUN mkdir -p /src \
     && make clean \
     && rm -rf /src
 
-# hdf
+# hdf5
 RUN cd /usr/local/src \
-    && curl -f -L -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.2/src/hdf5-1.10.2.tar.gz \
-    && tar xzf hdf5-1.10.2.tar.gz \
-    && cd hdf5-1.10.2 \
+    && curl -f -L -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.gz \
+    && tar xzf hdf5-1.12.0.tar.gz \
+    && cd hdf5-1.12.0 \
     && ./configure --prefix=/usr/local --enable-shared --enable-build-mode=production CFLAGS="-O2 -Wl,-S" \
     && make -j 4 \
     && make install
@@ -112,30 +112,28 @@ RUN cd /usr/local/src \
 
 ## expat
 RUN cd /usr/local/src \
-    && curl -f -L -O https://github.com/libexpat/libexpat/releases/download/R_2_2_5/expat-2.2.5.tar.bz2 \
-    && tar xjf expat-2.2.5.tar.bz2 \
-    && cd expat-2.2.5 \
+    && curl -f -L -O https://github.com/libexpat/libexpat/releases/download/R_2_2_10/expat-2.2.10.tar.bz2 \
+    && tar xjf expat-2.2.10.tar.bz2 \
+    && cd expat-2.2.10 \
     && CFLAGS="-O2 -Wl,-S" ./configure --prefix=/usr/local \
     && make -j 4 \
     && make install
 
 ## webp
 RUN cd /usr/local/src \
-    && curl -f -L -O https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.6.1.tar.gz \
-    && tar xzf libwebp-0.6.1.tar.gz \
-    && cd libwebp-0.6.1 \
+    && curl -f -L -O https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.2.0.tar.gz \
+    && tar xzf libwebp-1.2.0.tar.gz \
+    && cd libwebp-1.2.0 \
     && CFLAGS="-O2 -Wl,-S" ./configure --prefix=/usr/local \
     && make -j 4 \
     && make install
 
-RUN yum -y install postgresql-devel
-    
 # gdal
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/gdal/2.4.0/gdal-2.4.0.tar.gz \
-    && tar xzf gdal-2.4.0.tar.gz \
-    && cd /src/gdal-2.4.0 \
+    && curl -f -L -O http://download.osgeo.org/gdal/2.4.4/gdal-2.4.4.tar.gz \
+    && tar xzf gdal-2.4.4.tar.gz \
+    && cd /src/gdal-2.4.4 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
         --with-threads \
         --disable-debug \
@@ -166,9 +164,9 @@ RUN mkdir -p /src \
         --with-netcdf=/usr/local/netcdf \
         --with-openjpeg \
         --with-jasper=/usr/local \
+        --with-hdf5=/usr/local \
         --without-python \
         --without-hdf4 \
-        --without-hdf5 \
     && make -j 12 \
     && make install
 
@@ -181,12 +179,12 @@ RUN for PYBIN in /opt/python/*/bin; do \
 
 # Replace SWIG's setup.py with this modified one, which gets numpy in
 # there as a dependency.
-ADD setup.py /src/gdal-2.4.0/swig/python/setup.py
+ADD setup.py /src/gdal-2.4.4/swig/python/setup.py
 
 # Replace the osgeo module __init__.py with this modified one, which
 # sets the GDAL_DATA and PROJ_LIB variables on import to where they've
 # been copied to.
-ADD gdalinit.py /src/gdal-2.4.0/swig/python/osgeo/__init__.py
+ADD gdalinit.py /src/gdal-2.4.4/swig/python/osgeo/__init__.py
 
 WORKDIR /io
 CMD ["/io/build-linux-wheels.sh"]
