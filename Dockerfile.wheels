@@ -128,6 +128,8 @@ RUN cd /usr/local/src \
     && make -j 4 \
     && make install
 
+RUN yum -y install postgresql-devel
+    
 # gdal
 RUN mkdir -p /src \
     && cd /src \
@@ -143,6 +145,7 @@ RUN mkdir -p /src \
         --without-jpeg12 \
         --with-libtiff \
         --with-jpeg \
+        --with-pg \
         --with-gif \
         --with-png \
         --with-webp \
@@ -166,16 +169,14 @@ RUN mkdir -p /src \
         --without-python \
         --without-hdf4 \
         --without-hdf5 \
-    && make -j 4 \
+    && make -j 12 \
     && make install
 
 # Bake dev requirements into the Docker image for faster builds
 ADD requirements.txt /tmp/requirements.txt
 RUN for PYBIN in /opt/python/*/bin; do \
-        if [[ $PYBIN == *"26"* ]]; then continue; fi; \
-        if [[ $PYBIN == *"33"* ]]; then continue; fi; \
-        $PYBIN/pip install -U pip ; \
-        $PYBIN/pip install -r /tmp/requirements.txt ; \
+        $PYBIN/pip install -U pip || true; \
+        $PYBIN/pip install -r /tmp/requirements.txt || true; \
     done
 
 # Replace SWIG's setup.py with this modified one, which gets numpy in
