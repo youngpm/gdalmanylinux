@@ -1,2 +1,2 @@
 cython        --only-binary cython
-numpy>=1.11   --only-binary numpy
+numpy>=1.19   --only-binary numpy
