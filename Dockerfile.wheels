@@ -6,34 +6,19 @@
 # Note well: a very limited set of format drivers are included in these
 # wheels. See the GDAL configuration below for details.
 
-FROM quay.io/pypa/manylinux1_x86_64
+FROM quay.io/pypa/manylinux2014_x86_64
 
-RUN sed -i 's/enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf \
-    && sed -i 's/mirrorlist/#mirrorlist/' /etc/yum.repos.d/CentOS-Base.repo \
-    && sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever|baseurl=http://vault.centos.org/5.11|' /etc/yum.repos.d/CentOS-Base.repo
-
-RUN yum update -y && yum install -y curl-devel json-c-devel zlib-devel libtiff-devel postgresql-devel
+RUN yum update -y && yum install -y curl libcurl-devel json-c-devel zlib-devel libtiff-devel postgresql-devel
 
 # Install openssl
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O https://www.openssl.org/source/openssl-1.0.2o.tar.gz \
-    && echo "ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d  openssl-1.0.2o.tar.gz" > checksum \
+    && curl -f -L -O https://www.openssl.org/source/openssl-1.1.1q.tar.gz \
+    && echo "d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca  openssl-1.1.1q.tar.gz" > checksum \
     && sha256sum -c checksum \
-    && tar zxf openssl-1.0.2o.tar.gz \
-    && cd /src/openssl-1.0.2o \
-    && ./config no-shared no-ssl2 no-async -fPIC -O2 \
-    && make -j 4 \
-    && make install \
-    && rm -rf /src
-
-# Install curl
-RUN mkdir -p /src \
-    && cd /src \
-    && curl -f -L -O http://curl.askapache.com/download/curl-7.73.0.tar.bz2 \
-    && tar jxf curl-7.73.0.tar.bz2 \
-    && cd /src/curl-7.73.0 \
-    && LIBS=-ldl CFLAGS="-O2 -Wl,-S" ./configure --with-ssl=/usr/local/ssl \
+    && tar zxf openssl-1.1.1q.tar.gz \
+    && cd /src/openssl-1.1.1q \
+    && ./config no-shared no-ssl2 no-async -fPIC -O2 --prefix=/usr/local/ssl --openssldir=/usr/local/ssl \
     && make -j 4 \
     && make install \
     && rm -rf /src
@@ -41,9 +26,9 @@ RUN mkdir -p /src \
 # Install geos
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/geos/geos-3.9.0.tar.bz2 \
-    && tar jxf geos-3.9.0.tar.bz2 \
-    && cd /src/geos-3.9.0 \
+    && curl -f -L -O http://download.osgeo.org/geos/geos-3.11.0.tar.bz2 \
+    && tar jxf geos-3.11.0.tar.bz2 \
+    && cd /src/geos-3.11.0 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
     && make -j 4 \
     && make install \
@@ -63,21 +48,15 @@ RUN mkdir -p /src \
 # proj4
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/proj/proj-4.9.3.tar.gz \
-    && tar xzf proj-4.9.3.tar.gz \
-    && cd /src/proj-4.9.3 \
-    && ./configure CFLAGS="-O2 -Wl,-S" \
-    && make -j 4 \
-    && make install \
+    && curl -f -L -O http://download.osgeo.org/proj/proj-9.0.1.tar.gz \
+    && tar xzf proj-9.0.1.tar.gz \
+    && cd /src/proj-9.0.1 \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && cmake --build . \
+    && cmake --install . \
     && rm -rf /src
-
-# cmake
-RUN cd /usr/local/src \
-    && curl -f -L -O http://www.cmake.org/files/v3.13/cmake-3.13.5.tar.gz \
-    && tar xzf cmake-3.13.5.tar.gz \
-    && cd cmake-3.13.5 \
-    && ./bootstrap --prefix=/usr/local/cmake \
-    && make -j 4; make install
 
 # openjpeg
 RUN mkdir -p /src \
@@ -87,28 +66,30 @@ RUN mkdir -p /src \
     && cd /src/openjpeg-2.4.0 \
     && mkdir -p build \
     && cd build \
-    && /usr/local/cmake/bin/cmake .. -DBUILD_THIRDPARTY:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake .. -DBUILD_THIRDPARTY:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local \
     && make -j 4 install \
     && make clean \
     && rm -rf /src
 
 # hdf5
 RUN cd /usr/local/src \
-    && curl -f -L -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.gz \
-    && tar xzf hdf5-1.12.0.tar.gz \
-    && cd hdf5-1.12.0 \
+    && curl -f -L -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.gz \
+    && tar xzf hdf5-1.12.1.tar.gz \
+    && cd hdf5-1.12.1 \
     && ./configure --prefix=/usr/local --enable-shared --enable-build-mode=production CFLAGS="-O2 -Wl,-S" \
     && make -j 4 \
     && make install
 
 ## netcdf
 RUN cd /usr/local/src \
-    && curl -f -L -O ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.6.1.tar.gz \
-    && tar xzf netcdf-4.6.1.tar.gz \
-    && cd netcdf-4.6.1 \
-    && CFLAGS="-I/usr/local/include -O2 -Wl,-S" CXXFLAGS="-I/usr/local/include -O2 -Wl,-S" LDFLAGS="-L/usr/local/lib" ./configure \
-    && make -j 4 \
-    && make install
+    && curl -f -L -O https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz \
+    && tar xzf v4.8.1.tar.gz \
+    && cd netcdf-c-4.8.1 \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && cmake --build . \
+    && cmake –-install .
 
 ## expat
 RUN cd /usr/local/src \
@@ -131,10 +112,11 @@ RUN cd /usr/local/src \
 # gdal
 RUN mkdir -p /src \
     && cd /src \
-    && curl -f -L -O http://download.osgeo.org/gdal/2.4.4/gdal-2.4.4.tar.gz \
-    && tar xzf gdal-2.4.4.tar.gz \
-    && cd /src/gdal-2.4.4 \
+    && curl -f -L -O http://download.osgeo.org/gdal/3.5.1/gdal-3.5.1.tar.gz \
+    && tar xzf gdal-3.5.1.tar.gz \
+    && cd /src/gdal-3.5.1 \
     && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
+        PQ_CFLAGS="-I/usr/include" PQ_LIBS="-L/usr/lib64 -lpq" \
         --with-threads \
         --disable-debug \
         --disable-static \
@@ -174,17 +156,18 @@ RUN mkdir -p /src \
 ADD requirements.txt /tmp/requirements.txt
 RUN for PYBIN in /opt/python/*/bin; do \
         $PYBIN/pip install -U pip || true; \
+        $PYBIN/pip install setuptools==57.5.0 || true; \
         $PYBIN/pip install -r /tmp/requirements.txt || true; \
     done
 
 # Replace SWIG's setup.py with this modified one, which gets numpy in
 # there as a dependency.
-ADD setup.py /src/gdal-2.4.4/swig/python/setup.py
+ADD setup.py /src/gdal-3.5.1/swig/python/setup.py
 
 # Replace the osgeo module __init__.py with this modified one, which
 # sets the GDAL_DATA and PROJ_LIB variables on import to where they've
 # been copied to.
-ADD gdalinit.py /src/gdal-2.4.4/swig/python/osgeo/__init__.py
+ADD gdalinit.py /src/gdal-3.5.1/swig/python/osgeo/__init__.py
 
 WORKDIR /io
 CMD ["/io/build-linux-wheels.sh"]
